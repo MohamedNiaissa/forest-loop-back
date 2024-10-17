@@ -10,8 +10,8 @@ npm install
 nodemon server.js
 ```
 
-
 or
+
 ```sh
 node server.js
 ```
