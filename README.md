@@ -9,3 +9,11 @@ npm install
 ```sh
 nodemon server.js
 ```
+
+
+or
+```sh
+node server.js
+```
+
+
