@@ -1,5 +1,14 @@
 const http = require('http');
 const app = require('./app');
+const server = http.createServer(app);
+const { Server } = require("socket.io")
+
+const io = require("socket.io")(server, {
+    cors: {
+        origin: "*",
+    }
+});
+
 
 /*
  renvoie un port valide, qu'il soit fourni sous la forme d'un numéro ou d'une chaîne;
@@ -43,7 +52,19 @@ const errorHandler = error => {
     }
 };
 
-const server = http.createServer(app);
+io.on('connection', (socket) => {
+    console.log('a user connected');
+
+    socket.on('test message', (message) => {
+        console.log('message: ', message.content ," from: ", socket.id);
+        io.emit('test message', 'test message from server');
+    });
+
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    });
+});
+
 
 server.on('error', errorHandler);
 server.on('listening', () => {
