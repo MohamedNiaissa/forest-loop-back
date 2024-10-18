@@ -149,27 +149,44 @@ io.on('connection', (socket) => {
 
         const isClientAlreadyInRoom = Object.values(rooms).some(room => room.includes(hostIpAddress));
         const doesRoomExist = Object.keys(rooms).some(room => room == roomNumber);
+        console.log('rooms',rooms + ' ' + 'room exist' + doesRoomExist);
+        
 
-        if (doesRoomExist) {
-            console.log('on est avant');
+        // if (doesRoomExist) {
+        //     console.log('on est avant');
 
-            if (!isClientAlreadyInRoom) {
-                console.log('on est la :-)');
+        //     if (!isClientAlreadyInRoom) {
+        //         console.log('on est la :-)');
                 
-                if (rooms[roomNumber].length < 2) {
-                    socket.join(roomNumber)
-                    rooms[roomNumber].append(socket.handshake.address)
-                    io.emit("join room", rooms)
-                } else {
-                    socket.emit('full room')
-                }
-            } else {
-                socket.emit('already in room')
-            }
-        } else {
-            socket.emit('room does not exist')
-            console.log('on est pas la');
+        //         if (rooms[roomNumber].length < 2) {
+        //             socket.join(roomNumber)
+        //             rooms[roomNumber].append(socket.handshake.address)
+        //             io.emit("join room", rooms)
+        //         } else {
+        //             socket.emit('full room')
+        //         }
+        //     } else {
+        //         socket.emit('already in room')
+        //     }
+        // } else {
+        //     socket.emit('room does not exist')
+        //     console.log('on est pas la');
 
+        // }
+
+        if (doesRoomExist && !isClientAlreadyInRoom && rooms[roomNumber].length < 2) {
+            console.log('room existe');
+            console.log('on peut entrer');
+            socket.join(roomNumber)
+            rooms[roomNumber].append(socket.handshake.address)
+            io.emit("join room", rooms)
+
+        } else {
+            !doesRoomExist ?? socket.emit('room does not exist')
+            isClientAlreadyInRoom ??   socket.emit('already in room');
+            rooms[roomNumber].length == 2 ?? socket.emit('full room');
+            
+            console.log('on est pas la');
         }
     console.log(doesRoomExist);
 
