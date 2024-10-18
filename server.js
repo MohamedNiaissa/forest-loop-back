@@ -152,6 +152,7 @@ io.on('connection', (socket) => {
                 if (rooms[roomNumber].length < 2) {
                     socket.join(roomNumber)
                     rooms[roomNumber].append(socket.handshake.address)
+                    io.emit("join room", rooms)
                 } else {
                     socket.emit('full room')
                 }
