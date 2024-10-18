@@ -134,6 +134,9 @@ io.on('connection', (socket) => {
 
     socket.on('join game', (roomNumber) => {
 
+        console.log(roomNumber, 'here');
+        
+
         // verif if user not already in rooms
         // put user in rooms
         // socket.join()
@@ -148,7 +151,11 @@ io.on('connection', (socket) => {
         const doesRoomExist = Object.keys(rooms).some(room => room == roomNumber);
 
         if (doesRoomExist) {
+            console.log('on est avant');
+
             if (!isClientAlreadyInRoom) {
+                console.log('on est la :-)');
+                
                 if (rooms[roomNumber].length < 2) {
                     socket.join(roomNumber)
                     rooms[roomNumber].append(socket.handshake.address)
@@ -161,9 +168,14 @@ io.on('connection', (socket) => {
             }
         } else {
             socket.emit('room does not exist')
+            console.log('on est pas la');
+
         }
+    console.log(doesRoomExist);
+
     })
 
+    
 
     socket.on('send room', () => {
         socket.to("room1").emit("event room1", "hello from server room1");
