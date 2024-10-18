@@ -88,6 +88,10 @@ const errorHandler = error => {
 io.on('connection', (socket) => {
     //console.log(socket)
     console.log('a user connected', socket.id);
+    console.log('User connected from:', socket.handshake.address);
+    console.log(socket.connected);
+    console.log(socket);
+
 
     socket.on('test message', (message) => {
         console.log('message: ', message.content ," from: ", socket.id);
@@ -248,4 +252,8 @@ server.on('listening', () => {
     console.log('Listening on ' + bind);
 });
 
-server.listen(port);
+// server.listen(port);
+
+server.listen(3000, '0.0.0.0', () => {
+    console.log('Server is running on port 3000');
+  });
