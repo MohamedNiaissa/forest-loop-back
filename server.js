@@ -92,8 +92,12 @@ io.on('connection', (socket) => {
     console.log(socket.connected);
     console.log(socket);
     let ipAddress = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
+    console.log("isArray ip: ", Array.isArray(ipAddress))
+    console.log("type ip address", typeof ipAddress)
     if (Array.isArray(ipAddress)) {
         ipAddress = ipAddress[0];
+        console.log("array ip", ipAddress)
+
     }
     console.log('User connected from:', ipAddress);
 
