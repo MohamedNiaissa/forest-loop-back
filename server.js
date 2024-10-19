@@ -155,6 +155,8 @@ io.on('connection', (socket) => {
         const doesRoomExist = Object.keys(rooms).some(room => room == roomNumber);
         console.log('rooms',rooms.toString() + ' ' + 'room exist' + doesRoomExist);
         console.log('is already in room', isClientAlreadyInRoom);
+        console.log(rooms)
+        console.log(rooms[roomNumber])
         console.log('salle pleine', rooms[roomNumber].length < 2);
         console.log('ip adress', guestIdAddress);
 
