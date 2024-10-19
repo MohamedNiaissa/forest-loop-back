@@ -60,6 +60,7 @@ const normalizePort = val => {
 
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
+app.set('trust proxy', true);
 
 /*
  recherche les différentes erreurs et les gère de manière appropriée.
@@ -88,9 +89,14 @@ const errorHandler = error => {
 io.on('connection', (socket) => {
     //console.log(socket)
     console.log('a user connected', socket.id);
-    console.log('User connected from:', socket.handshake.address);
     console.log(socket.connected);
     console.log(socket);
+    let ipAddress = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
+    if (Array.isArray(ipAddress)) {
+        ipAddress = ipAddress[0];
+    }
+    console.log('User connected from:', ipAddress);
+
 
 
     socket.on('test message', (message) => {
@@ -139,7 +145,7 @@ io.on('connection', (socket) => {
     socket.on('join game', (roomNumber) => {
 
         console.log(roomNumber, 'here');
-        
+
 
         // verif if user not already in rooms
         // put user in rooms
@@ -157,17 +163,17 @@ io.on('connection', (socket) => {
         console.log('is already in room', isClientAlreadyInRoom);
         console.log('salle pleine', rooms[roomNumber].length < 2);
         console.log('ip adress', hostIpAddress);
-        
 
-        
-        
+
+
+
 
         // if (doesRoomExist) {
         //     console.log('on est avant');
 
         //     if (!isClientAlreadyInRoom) {
         //         console.log('on est la :-)');
-                
+
         //         if (rooms[roomNumber].length < 2) {
         //             socket.join(roomNumber)
         //             rooms[roomNumber].append(socket.handshake.address)
@@ -195,14 +201,14 @@ io.on('connection', (socket) => {
             !doesRoomExist ?? socket.emit('room does not exist')
             isClientAlreadyInRoom ??   socket.emit('already in room');
             rooms[roomNumber].length == 2 ?? socket.emit('full room');
-            
+
             console.log('on est pas la');
         }
     console.log(doesRoomExist);
 
     })
 
-    
+
 
     socket.on('send room', () => {
         socket.to("room1").emit("event room1", "hello from server room1");
