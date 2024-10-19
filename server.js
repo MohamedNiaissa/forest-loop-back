@@ -9,9 +9,9 @@ let roomId = 100;
 /*
 
   {
-    "room1": [ipAddr1, ipAddr2],
-    "room2": [ipAddr3, ipAddr4],
-    "room3": [ipAddr5, ipAddr6]
+    "room1": [socketId1, socketId2],
+    "room2": [socketId3, socketId4],
+    "room3": [socketId5, socketId6]
   }
 
  */
@@ -60,7 +60,6 @@ const normalizePort = val => {
 
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
-app.set('trust proxy', true);
 
 /*
  recherche les différentes erreurs et les gère de manière appropriée.
@@ -89,18 +88,9 @@ const errorHandler = error => {
 io.on('connection', (socket) => {
     //console.log(socket)
     console.log('a user connected', socket.id);
+    console.log('User connected from:', socket.id);
     console.log(socket.connected);
-    console.log(socket);
-    let ipAddress = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
-    console.log("isArray ip: ", Array.isArray(ipAddress))
-    console.log("type ip address", typeof ipAddress)
-    if (Array.isArray(ipAddress)) {
-        ipAddress = ipAddress[0];
-        console.log("array ip", ipAddress)
-
-    }
-    console.log('User connected from:', ipAddress);
-
+    //console.log(socket);
 
 
     socket.on('test message', (message) => {
@@ -124,19 +114,19 @@ io.on('connection', (socket) => {
 
         // add in rooms object
         //let isClientAlreadyInRoom = false
-        const hostIpAddress = socket.handshake.address;
+        const hostSocketId = socket.id;
 
        /* Object.keys(rooms).forEach(key => {
             isClientAlreadyInRoom = rooms[key].includes(hostIpAddress)
         });*/
-        const isClientAlreadyInRoom = Object.values(rooms).some(room => room.includes(hostIpAddress));
+        const isClientAlreadyInRoom = Object.values(rooms).some(room => room.includes(hostSocketId));
 
 
         if (!isClientAlreadyInRoom) {
             // add in socket room
             socket.join(roomId)
 
-            rooms[roomId] = [hostIpAddress]
+            rooms[roomId] = [hostSocketId]
             io.emit('new room', rooms);
             roomId++
 
@@ -157,16 +147,16 @@ io.on('connection', (socket) => {
 
         // property socket.rooms -> list rooms for the socket in an objects, by default socket is in a room -> ex: Set(2) { 'nyBeoS4V7eVHYPpcAAAF', 'room1' }
 
-        const hostIpAddress = socket.handshake.address;
+        const guestIdAddress = socket.id;
 
         console.log(typeof roomNumber) // to debug next comparison
 
-        const isClientAlreadyInRoom = Object.values(rooms).some(room => room.includes(hostIpAddress));
+        const isClientAlreadyInRoom = Object.values(rooms).some(room => room.includes(guestIdAddress));
         const doesRoomExist = Object.keys(rooms).some(room => room == roomNumber);
         console.log('rooms',rooms.toString() + ' ' + 'room exist' + doesRoomExist);
         console.log('is already in room', isClientAlreadyInRoom);
         console.log('salle pleine', rooms[roomNumber].length < 2);
-        console.log('ip adress', hostIpAddress);
+        console.log('ip adress', guestIdAddress);
 
 
 
@@ -194,7 +184,7 @@ io.on('connection', (socket) => {
 
         // }
 
-        if (doesRoomExist && !isClientAlreadyInRoom && rooms[roomNumber].length < 2) {
+      /*  if (doesRoomExist && !isClientAlreadyInRoom && rooms[roomNumber].length < 2) {
             console.log('room existe');
             console.log('on peut entrer');
             socket.join(roomNumber)
@@ -204,22 +194,37 @@ io.on('connection', (socket) => {
         } else {
             !doesRoomExist ?? socket.emit('room does not exist')
             isClientAlreadyInRoom ??   socket.emit('already in room');
-            rooms[roomNumber].length == 2 ?? socket.emit('full room');
+            rooms[roomNumber].length === 2 ?? socket.emit('full room');
 
             console.log('on est pas la');
         }
-    console.log(doesRoomExist);
+*/
+        if (!doesRoomExist) {
+            socket.emit('room does not exist');
+            console.log('Room does not exist');
+        } else if (isClientAlreadyInRoom) {
+            socket.emit('already in room');
+            console.log('User is already in the room');
+        } else if (rooms[roomNumber].length >= 2) {
+            socket.emit('full room');
+            console.log('Room is full');
+        } else {
+            console.log('Room exists and is not full. User can enter.');
+            socket.join(roomNumber);
+            rooms[roomNumber].push(socket.id);
+            io.emit('join room', rooms);
+        }
+
+        console.log(doesRoomExist);
 
     })
-
-
 
     socket.on('send room', () => {
         socket.to("room1").emit("event room1", "hello from server room1");
     })
 
     socket.on('events', (data) => {
-        const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.handshake.address)) || null;
+        const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
         if (userRoom) {
             socket.to(userRoom).emit("events", data)
@@ -227,7 +232,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on('player coordinates', (data) => {
-        const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.handshake.address)) || null;
+        const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
         if (userRoom) {
             socket.to(userRoom).emit("player coordinate", data)
@@ -245,7 +250,7 @@ io.on('connection', (socket) => {
             }
         });*/
 
-        const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.handshake.address)) || null;
+        const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
         if (userRoom) {
             io.to(userRoom).emit("end game")
@@ -262,8 +267,8 @@ server.on('listening', () => {
     console.log('Listening on ' + bind);
 });
 
-// server.listen(port);
+server.listen(port);
 
-server.listen(3000, '0.0.0.0', () => {
+/*server.listen(3000, '0.0.0.0', () => {
     console.log('Server is running on port 3000');
-  });
+  });*/
