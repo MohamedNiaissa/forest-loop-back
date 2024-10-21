@@ -115,6 +115,7 @@ io.on('connection', (socket) => {
             rooms[roomId] = [hostSocketId]
             io.emit('new room', rooms);
             roomId++
+            console.log("init game", rooms)
 
         }
 
@@ -128,6 +129,8 @@ io.on('connection', (socket) => {
 
         const isClientAlreadyInRoom = Object.values(rooms).some(room => room.includes(guestIdAddress));
         const doesRoomExist = Object.keys(rooms).some(room => room == roomNumber);
+
+        console.log("join game", rooms)
 
         if (!doesRoomExist) {
             socket.emit('room does not exist');
