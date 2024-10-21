@@ -16,22 +16,21 @@ let roomId = 100;
 
  */
 
+// P1 Unity player
+// P2 Web player
+
 // maybe handle user disconnect
 // ideas for client
 //  deviceId = generateUniqueId(); // Implement this function
 //     localStorage.setItem('deviceId', deviceId);
 // or store ip address
 
+// create room for P1
+// create room and put in rooms list and sockets join list
 
-// creer room pour J1
-// creer room et mettre dans rooms et sockets join list
-
-// J2 join
-// verif if room name given by J2 is in rooms if yes inclure J2 in room, if no return message room not exist
+// P2 join
+// verif if room name given by J2 is in rooms if yes include P2 in room, if no return message room not exist
 // once J2 join io.emit to room start game (allowing unity to run game, web to move to gameplay page)
-
-// logique pour trouver room en fonction du socket unity si il est déja dedans
-// une fois room trouvé socket.to les events
 
 // J1 et J2 finissent la partie ou la quitte
 // remove from rooms et socket lists et suppr
@@ -86,12 +85,8 @@ const errorHandler = error => {
 };
 
 io.on('connection', (socket) => {
-    //console.log(socket)
-    console.log('a user connected', socket.id);
     console.log('User connected from:', socket.id);
-    console.log(socket.connected);
-    //console.log(socket);
-
+    const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
     socket.on('test message', (message) => {
         console.log('message: ', message.content ," from: ", socket.id);
@@ -108,16 +103,11 @@ io.on('connection', (socket) => {
         console.log('user disconnected', socket.id);
     });
 
-
     socket.on('init game', () => {
-        console.log(roomId)
-
         // add in rooms object
-        //let isClientAlreadyInRoom = false
         const hostSocketId = socket.id;
 
         const isClientAlreadyInRoom = Object.values(rooms).some(room => room.includes(hostSocketId));
-
 
         if (!isClientAlreadyInRoom) {
             // add in socket room
@@ -129,70 +119,17 @@ io.on('connection', (socket) => {
 
         }
 
-        console.log(rooms)
-
     })
 
     socket.on('join game', (roomNumber) => {
-
-        console.log(roomNumber, 'here');
-
-
-        // verif if user not already in rooms
-        // put user in rooms
-        // socket.join()
 
         // property socket.rooms -> list rooms for the socket in an objects, by default socket is in a room -> ex: Set(2) { 'nyBeoS4V7eVHYPpcAAAF', 'room1' }
 
         const guestIdAddress = socket.id;
 
-        console.log(typeof roomNumber) // to debug next comparison
-
         const isClientAlreadyInRoom = Object.values(rooms).some(room => room.includes(guestIdAddress));
         const doesRoomExist = Object.keys(rooms).some(room => room == roomNumber);
-        console.log('rooms',rooms.toString() + ' ' + 'room exist' + doesRoomExist);
-        console.log('is already in room', isClientAlreadyInRoom);
-        console.log(rooms)
-        console.log(rooms[roomNumber])
-        console.log('salle pleine', rooms[roomNumber].length < 2);
 
-        // if (doesRoomExist) {
-        //     console.log('on est avant');
-
-        //     if (!isClientAlreadyInRoom) {
-        //         console.log('on est la :-)');
-
-        //         if (rooms[roomNumber].length < 2) {
-        //             socket.join(roomNumber)
-        //             rooms[roomNumber].append(socket.handshake.address)
-        //             io.emit("join room", rooms)
-        //         } else {
-        //             socket.emit('full room')
-        //         }
-        //     } else {
-        //         socket.emit('already in room')
-        //     }
-        // } else {
-        //     socket.emit('room does not exist')
-        //     console.log('on est pas la');
-
-        // }
-
-      /*  if (doesRoomExist && !isClientAlreadyInRoom && rooms[roomNumber].length < 2) {
-            console.log('room existe');
-            console.log('on peut entrer');
-            socket.join(roomNumber)
-            rooms[roomNumber].append(socket.handshake.address)
-            io.emit("join room", rooms)
-
-        } else {
-            !doesRoomExist ?? socket.emit('room does not exist')
-            isClientAlreadyInRoom ??   socket.emit('already in room');
-            rooms[roomNumber].length === 2 ?? socket.emit('full room');
-
-            console.log('on est pas la');
-        }
-*/
         if (!doesRoomExist) {
             socket.emit('room does not exist');
             console.log('Room does not exist');
@@ -209,8 +146,6 @@ io.on('connection', (socket) => {
             io.emit('join room', rooms);
         }
 
-        console.log(doesRoomExist);
-
     })
 
     socket.on('send room', () => {
@@ -218,37 +153,18 @@ io.on('connection', (socket) => {
     })
 
     socket.on('events', (data) => {
-        const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
-
-        console.log(userRoom)
-        console.log(rooms)
-
         if (userRoom) {
             socket.to(userRoom).emit("events", data)
         }
     })
 
     socket.on('player coordinates', (data) => {
-        const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
-
         if (userRoom) {
             socket.to(userRoom).emit("player coordinate", data)
         }
     })
 
     socket.on('end game', () => {
-        // algo to find room from ip address, put it then globally
-        // io.to(room).emit("end game")
-
-      /*  let userRoom = null
-        Object.keys(rooms).forEach(key => {
-            if (rooms[key].includes(socket.handshake.address)) {
-                userRoom = key
-            }
-        });*/
-
-        const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
-
         if (userRoom) {
             io.to(userRoom).emit("end game")
         }
@@ -265,7 +181,3 @@ server.on('listening', () => {
 });
 
 server.listen(port);
-
-/*server.listen(3000, '0.0.0.0', () => {
-    console.log('Server is running on port 3000');
-  });*/
