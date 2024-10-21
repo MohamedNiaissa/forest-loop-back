@@ -86,7 +86,6 @@ const errorHandler = error => {
 
 io.on('connection', (socket) => {
     console.log('User connected from:', socket.id);
-    const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
     socket.on('test message', (message) => {
         console.log('message: ', message.content ," from: ", socket.id);
@@ -153,21 +152,40 @@ io.on('connection', (socket) => {
     })
 
     socket.on('events', (data) => {
-        console.log(rooms)
-        console.log(userRoom)
+        const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
+
         if (userRoom) {
-            console.log("in condition")
             socket.to(userRoom).emit("events", data)
         }
     })
 
-    socket.on('player coordinates', (data) => {
+    socket.on('playerCoords', (data) => {
+        const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
+
         if (userRoom) {
-            socket.to(userRoom).emit("player coordinate", data)
+            socket.to(userRoom).emit("playerCoords", data)
+        }
+    })
+
+    socket.on('monsterCoords', (data) => {
+        const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
+
+        if (userRoom) {
+            socket.to(userRoom).emit("monsterCoords", data)
+        }
+    })
+
+    socket.on('playerDeath', (data) => {
+        const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
+
+        if (userRoom) {
+            socket.to(userRoom).emit("playerDeath", data)
         }
     })
 
     socket.on('end game', () => {
+        const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
+
         if (userRoom) {
             io.to(userRoom).emit("end game")
         }
