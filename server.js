@@ -162,15 +162,16 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on('playerCoords', (data) => {
+    socket.on('playerCoords', (coords) => {
         const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
         console.log("player coords")
-        console.log(data)
+        console.log(coords.x)
+        console.log(coords.y)
         console.log(userRoom)
         console.log(rooms)
         if (userRoom) {
-            socket.to(userRoom).emit("playerCoords", data)
+            socket.to(userRoom).emit("playerCoords", coords.x)
         }
     })
 
