@@ -185,6 +185,11 @@ io.on('connection', (socket) => {
     socket.on('playerDeath', (data) => {
         const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
+        console.log("player death")
+        console.log(data)
+        console.log(userRoom)
+        console.log(rooms)
+
         if (userRoom) {
             socket.to(userRoom).emit("playerDeath", data)
         }
