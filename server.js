@@ -166,6 +166,7 @@ io.on('connection', (socket) => {
         const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
         console.log("player coords")
+        console.log(coords)
         console.log(coords.x)
         console.log(coords.y)
         console.log(userRoom)
