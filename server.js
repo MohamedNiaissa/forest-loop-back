@@ -116,9 +116,6 @@ io.on('connection', (socket) => {
         //let isClientAlreadyInRoom = false
         const hostSocketId = socket.id;
 
-       /* Object.keys(rooms).forEach(key => {
-            isClientAlreadyInRoom = rooms[key].includes(hostIpAddress)
-        });*/
         const isClientAlreadyInRoom = Object.values(rooms).some(room => room.includes(hostSocketId));
 
 
@@ -158,11 +155,6 @@ io.on('connection', (socket) => {
         console.log(rooms)
         console.log(rooms[roomNumber])
         console.log('salle pleine', rooms[roomNumber].length < 2);
-        console.log('ip adress', guestIdAddress);
-
-
-
-
 
         // if (doesRoomExist) {
         //     console.log('on est avant');
@@ -227,6 +219,9 @@ io.on('connection', (socket) => {
 
     socket.on('events', (data) => {
         const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
+
+        console.log(userRoom)
+        console.log(rooms)
 
         if (userRoom) {
             socket.to(userRoom).emit("events", data)
