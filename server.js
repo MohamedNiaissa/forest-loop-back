@@ -153,7 +153,10 @@ io.on('connection', (socket) => {
     })
 
     socket.on('events', (data) => {
+        console.log(rooms)
+        console.log(userRoom)
         if (userRoom) {
+            console.log("in condition")
             socket.to(userRoom).emit("events", data)
         }
     })
