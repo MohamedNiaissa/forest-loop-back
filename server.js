@@ -117,33 +117,31 @@ io.on('connection', (socket) => {
     })
 
     socket.on('join game', (roomNumber) => {
-
-        // property socket.rooms -> list rooms for the socket in an objects, by default socket is in a room -> ex: Set(2) { 'nyBeoS4V7eVHYPpcAAAF', 'room1' }
-
         const guestIdAddress = socket.id;
-
+    
         const isClientAlreadyInRoom = Object.values(rooms).some(room => room.includes(guestIdAddress));
         const doesRoomExist = Object.keys(rooms).some(room => room == roomNumber);
-
-        console.log("join game", rooms)
-
+    
+        console.log("join game", rooms);
+    
         if (!doesRoomExist) {
-            socket.emit('room does not exist');
+            socket.emit('join response', { success: false, message: 'Room does not exist' });
             console.log('Room does not exist');
         } else if (isClientAlreadyInRoom) {
-            socket.emit('already in room');
+            socket.emit('join response', { success: false, message: 'Already in room' });
             console.log('User is already in the room');
         } else if (rooms[roomNumber].length >= 2) {
-            socket.emit('full room');
+            socket.emit('join response', { success: false, message: 'Room is full' });
             console.log('Room is full');
         } else {
             console.log('Room exists and is not full. User can enter.');
             socket.join(roomNumber);
             rooms[roomNumber].push(socket.id);
-            io.to(roomNumber).emit('join room', roomNumber)
+            socket.emit('join response', { success: true }); 
+            io.to(roomNumber).emit('join room', roomNumber); 
         }
-
-    })
+    });
+    
 
     socket.on('send rules', (data) => {
         const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
