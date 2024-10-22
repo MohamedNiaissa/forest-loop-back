@@ -110,10 +110,10 @@ io.on('connection', (socket) => {
 
         if (!isClientAlreadyInRoom) {
             // add in socket room
-            socket.join(roomId)
+            socket.join(roomId + "")
 
             rooms[roomId] = [hostSocketId]
-            io.emit('new room', roomId);
+            socket.emit('new room', roomId + "");
             console.log(roomId)
             roomId++
             console.log("init game", rooms)
@@ -146,7 +146,7 @@ io.on('connection', (socket) => {
             console.log('Room exists and is not full. User can enter.');
             socket.join(roomNumber);
             rooms[roomNumber].push(socket.id);
-            socket.to(roomNumber).emit("join room")
+            io.to(roomNumber).emit('join room', roomNumber)
         }
 
     })
