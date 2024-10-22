@@ -150,11 +150,12 @@ io.on('connection', (socket) => {
 
     })
 
-    socket.on('events', (data) => {
+    socket.on('send rules', (data) => {
         const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
         if (userRoom) {
-            socket.to(userRoom).emit("events", data)
+            console.log(data)
+            socket.to(userRoom).emit("send rules", data)
         }
     })
 
