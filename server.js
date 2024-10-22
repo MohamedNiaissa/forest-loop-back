@@ -196,7 +196,7 @@ io.on('connection', (socket) => {
 
         if (userRoom) {
             socket.leave(userRoom)
-            rooms = delete rooms[roomId]
+            delete rooms[userRoom]
             console.log(rooms)
             io.to(userRoom).emit("end game")
         }
