@@ -3,7 +3,7 @@ const app = require('./app');
 const server = http.createServer(app);
 const { Server } = require("socket.io")
 
-const rooms = {}
+let rooms = {}
 let roomId = 100;
 
 /*
@@ -113,7 +113,7 @@ io.on('connection', (socket) => {
             socket.join(roomId)
 
             rooms[roomId] = [hostSocketId]
-            io.emit('new room', rooms);
+            io.emit('new room', roomId);
             roomId++
             console.log("init game", rooms)
 
@@ -165,22 +165,16 @@ io.on('connection', (socket) => {
     socket.on('playerCoords', (coords) => {
         const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
-        console.log("player coords")
-        console.log(coords)
-        console.log(coords.x)
-        console.log(coords.y)
-        console.log(userRoom)
-        console.log(rooms)
         if (userRoom) {
-            socket.to(userRoom).emit("playerCoords", coords.x)
+            socket.to(userRoom).emit("playerCoords", coords)
         }
     })
 
-    socket.on('monsterCoords', (data) => {
+    socket.on('monsterCoords', (coords) => {
         const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
         if (userRoom) {
-            socket.to(userRoom).emit("monsterCoords", data)
+            socket.to(userRoom).emit("monsterCoords", coords)
         }
     })
 
@@ -201,6 +195,9 @@ io.on('connection', (socket) => {
         const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
         if (userRoom) {
+            socket.leave(userRoom)
+            rooms = delete rooms[roomId]
+            console.log(rooms)
             io.to(userRoom).emit("end game")
         }
     })
