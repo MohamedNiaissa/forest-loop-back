@@ -88,14 +88,8 @@ io.on('connection', (socket) => {
     console.log('User connected from:', socket.id);
 
     socket.on('test message', (message) => {
-        console.log('message: ', message.content ," from: ", socket.id);
+        console.log('message: ', message ," from: ", socket.id);
         io.emit('test message', 'test message from server');
-    });
-
-    socket.on('socket', () => {
-        const ipAddress = socket.handshake.address;
-        console.log(socket.handshake)
-        io.emit('socket', ipAddress);
     });
 
     socket.on('disconnect', () => {
@@ -160,11 +154,11 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on('playerCoords', (coords) => {
+    socket.on('player coords ', (coords) => {
         const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
         if (userRoom) {
-            socket.to(userRoom).emit("playerCoords", coords)
+            socket.to(userRoom).emit("player coords ", coords)
         }
     })
 
@@ -172,7 +166,7 @@ io.on('connection', (socket) => {
         const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
         if (userRoom) {
-            socket.to(userRoom).emit("monsterCoords", coords)
+            socket.to(userRoom).emit("monster coords", coords)
         }
     })
 
@@ -180,7 +174,7 @@ io.on('connection', (socket) => {
         const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
         if (userRoom) {
-            socket.to(userRoom).emit("playerDeath")
+            socket.to(userRoom).emit("player death")
         }
     })
 
