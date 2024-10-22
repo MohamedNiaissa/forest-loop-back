@@ -118,8 +118,6 @@ io.on('connection', (socket) => {
 
     socket.on('join game', (roomNumber) => {
 
-        // property socket.rooms -> list rooms for the socket in an objects, by default socket is in a room -> ex: Set(2) { 'nyBeoS4V7eVHYPpcAAAF', 'room1' }
-
         const guestIdAddress = socket.id;
 
         const isClientAlreadyInRoom = Object.values(rooms).some(room => room.includes(guestIdAddress));
@@ -154,11 +152,11 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on('player coords ', (coords) => {
+    socket.on('player coords', (coords) => {
         const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
         if (userRoom) {
-            socket.to(userRoom).emit("player coords ", coords)
+            socket.to(userRoom).emit("player coords", coords)
         }
     })
 
@@ -195,7 +193,6 @@ io.on('connection', (socket) => {
         if (userRoom) {
             io.to(userRoom).emit("game won")
         }
-
     })
 });
 
