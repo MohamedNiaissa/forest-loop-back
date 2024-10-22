@@ -114,6 +114,7 @@ io.on('connection', (socket) => {
 
             rooms[roomId] = [hostSocketId]
             io.emit('new room', roomId);
+            console.log(roomId)
             roomId++
             console.log("init game", rooms)
 
@@ -145,7 +146,7 @@ io.on('connection', (socket) => {
             console.log('Room exists and is not full. User can enter.');
             socket.join(roomNumber);
             rooms[roomNumber].push(socket.id);
-            io.emit('join room', rooms);
+            socket.to(roomNumber).emit("join room")
         }
 
     })
@@ -167,7 +168,7 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on('monsterCoords', (coords) => {
+    socket.on('monster coords', (coords) => {
         const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
         if (userRoom) {
@@ -175,7 +176,7 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on('playerDeath', () => {
+    socket.on('player death', () => {
         const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
         if (userRoom) {
@@ -194,6 +195,14 @@ io.on('connection', (socket) => {
         }
     })
 
+    socket.on('game won', () => {
+        const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
+
+        if (userRoom) {
+            io.to(userRoom).emit("game won")
+        }
+
+    })
 });
 
 
