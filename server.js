@@ -150,10 +150,6 @@ io.on('connection', (socket) => {
 
     })
 
-    socket.on('send room', () => {
-        socket.to("room1").emit("event room1", "hello from server room1");
-    })
-
     socket.on('events', (data) => {
         const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
@@ -178,16 +174,11 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on('playerDeath', (data) => {
+    socket.on('playerDeath', () => {
         const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
-        console.log("player death")
-        console.log(data)
-        console.log(userRoom)
-        console.log(rooms)
-
         if (userRoom) {
-            socket.to(userRoom).emit("playerDeath", data)
+            socket.to(userRoom).emit("playerDeath")
         }
     })
 
