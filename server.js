@@ -103,12 +103,12 @@ io.on('connection', (socket) => {
         const isClientAlreadyInRoom = Object.values(rooms).some(room => room.includes(hostSocketId));
 
         if (!isClientAlreadyInRoom) {
+            const roomIdToString = roomId + ""
             // add in socket room
-            socket.join(roomId + "")
+            socket.join(roomIdToString)
 
-            rooms[roomId] = [hostSocketId]
-            socket.emit('new room', roomId + "");
-            console.log(roomId)
+            rooms[roomIdToString] = [hostSocketId]
+            socket.emit('new room', roomIdToString);
             roomId++
             console.log("init game", rooms)
 
