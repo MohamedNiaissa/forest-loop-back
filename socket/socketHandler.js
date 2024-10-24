@@ -40,6 +40,7 @@ const setupSocket = (io) => {
 
         socket.on('disconnect', () => {
             console.log('user disconnected', socket.id);
+            endGame(socket, io)
         });
 
         socket.on('init game', () => {

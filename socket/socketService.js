@@ -25,8 +25,6 @@ const joinGame = (socket, roomNumber, io) => {
     const isClientAlreadyInRoom = Object.values(rooms).some(room => room.includes(guestIdAddress));
     const doesRoomExist = Object.keys(rooms).some(room => room == roomNumber);
 
-    console.log("join game", rooms)
-
     if (!doesRoomExist) {
         socket.emit('room does not exist');
         console.log('Room does not exist');

@@ -10,9 +10,6 @@ const io = require("socket.io")(server, {
     }
 });
 
-const setupSocket = require('./socket/socketHandler');
-
-setupSocket(io);
 
 /*
  renvoie un port valide, qu'il soit fourni sous la forme d'un numéro ou d'une chaîne;
@@ -56,6 +53,9 @@ const errorHandler = error => {
     }
 };
 
+const setupSocket = require('./socket/socketHandler');
+
+setupSocket(io);
 server.on('error', errorHandler);
 server.on('listening', () => {
     const address = server.address();
