@@ -12,6 +12,7 @@ const initGame = (socket) => {
         // add in socket room
         socket.join(roomIdToString)
 
+        // create room from roomId and put socket id of host in the value of roomId
         rooms[roomIdToString] = [hostSocketId]
         socket.emit('new room', roomIdToString);
         roomId++
@@ -54,7 +55,10 @@ const endGame = (socket, io) => {
     const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
     if (userRoom) {
+        // socket remove from userRoom
         socket.leave(userRoom)
+
+        // remove room from rooms dict
         delete rooms[userRoom]
         console.log(rooms)
         io.to(userRoom).emit("end game")

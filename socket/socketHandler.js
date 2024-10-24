@@ -33,6 +33,8 @@ const setupSocket = (io) => {
     io.on('connection', (socket) => {
         console.log('User connected from:', socket.id);
 
+        // Socket listeners
+
         socket.on('test message', (message) => {
             console.log('message: ', message ," from: ", socket.id);
             io.emit('test message', 'test message from server');
