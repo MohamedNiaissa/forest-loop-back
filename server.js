@@ -94,6 +94,15 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         console.log('user disconnected', socket.id);
+
+        const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
+
+        if (userRoom) {
+            socket.leave(userRoom)
+            delete rooms[userRoom]
+            console.log(rooms)
+            io.to(userRoom).emit("end game")
+        }
     });
 
     socket.on('init game', () => {
