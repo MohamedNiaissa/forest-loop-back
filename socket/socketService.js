@@ -55,13 +55,14 @@ const endGame = (socket, io) => {
     const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
     if (userRoom) {
-        // socket remove from userRoom
-        socket.leave(userRoom)
+        io.to(userRoom).emit("end game")
+
+        // remove all user from a specific room
+        io.socketsLeave(userRoom);
 
         // remove room from rooms dict
         delete rooms[userRoom]
         console.log(rooms)
-        io.to(userRoom).emit("end game")
     }
 }
 
@@ -69,7 +70,10 @@ const gameWon = (socket, io) => {
     const userRoom = Object.keys(rooms).find(key => rooms[key].includes(socket.id)) || null;
 
     if (userRoom) {
-        io.to(userRoom).emit("game won")
+        // remove all user from a specific room
+        socket.to(userRoom).emit("game won")
+        io.socketsLeave(userRoom);
+        delete rooms[userRoom]
     }
 }
 
